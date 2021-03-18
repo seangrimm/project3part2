@@ -1,18 +1,19 @@
 ---
-title: "my_rf_cv Vignette"
+title: "Project 3 Part 2"
 author: "Sean Grimm"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
 ```
 
-# my_rf_cv
+## my_rf_cv
 
 Lastly, we will demonstrate the use of `my_rf_cv`, which takes data from `my_penguins` and builds a model to predict `body_mass_g` using `bill_length_mm`, `bill_depth_mm`, and `flipper_length_mm`. The function returns the cross-validation estimate from k-fold cross-validation using k = `k`.
 
-```{r, include=TRUE, fig.height=4, fig.width=7}
+```{r, include=TRUE, fig.height=4, fig.width=7, message=FALSE}
 # load data from Data subfolder
 my_penguins <- read.csv("../Data/my_penguins.csv")
 
