@@ -1,0 +1,65 @@
+---
+title: "my_rf_cv Vignette"
+author: "Sean Grimm"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# my_rf_cv
+
+Lastly, we will demonstrate the use of `my_rf_cv`, which takes data from `my_penguins` and builds a model to predict `body_mass_g` using `bill_length_mm`, `bill_depth_mm`, and `flipper_length_mm`. The function returns the cross-validation estimate from k-fold cross-validation using k = `k`.
+
+```{r, include=TRUE, fig.height=4, fig.width=7}
+# load data from Data subfolder
+my_penguins <- read.csv("../Data/my_penguins.csv")
+
+# source code from Code subfolder
+my_rf_cv <- source("../Code/my_rf_cv.R")[[1]]
+
+# As seen in Part 1
+set.seed(302)
+
+cv_ests <- data.frame(rep(0, 90), rep(0, 90))
+colnames(cv_ests) <- c("k", "cv_est")
+
+for (i in 1:90) {
+  if (i < 31) {
+    cv_ests[i, 1] <- "2"
+    cv_ests[i, 2] <- my_rf_cv(2)
+  } else if (i < 61) {
+    cv_ests[i, 1] <- "5"
+    cv_ests[i, 2] <- my_rf_cv(5)
+  } else {
+    cv_ests[i, 1] <- "10"
+    cv_ests[i, 2] <- my_rf_cv(10)
+  }
+}
+
+cv_ests$k <- factor(cv_ests$k, levels = c("2", "5", "10"))
+
+error_plot <- ggplot(data = cv_ests, aes(x = k, y = cv_est, group = k)) +
+  geom_boxplot() +
+  labs(title = "k-Fold Cross-Validation Estimate") +
+  theme_bw()
+
+vect_2 <- c(mean(cv_ests[which(cv_ests$k == "2"), ]$cv_est),
+            sd(cv_ests[which(cv_ests$k == "2"), ]$cv_est))
+vect_5 <- c(mean(cv_ests[which(cv_ests$k == "5"), ]$cv_est),
+            sd(cv_ests[which(cv_ests$k == "5"), ]$cv_est))
+vect_10 <- c(mean(cv_ests[which(cv_ests$k == "10"), ]$cv_est),
+            sd(cv_ests[which(cv_ests$k == "10"), ]$cv_est))
+
+cv_table <- matrix(c(vect_2, vect_5, vect_10), nrow = 3, ncol = 2, byrow = TRUE)
+rownames(cv_table) <- c("k = 2", "k = 5", "k = 10")
+colnames(cv_table) <- c("Mean", "SD")
+as.table(cv_table)
+```
+
+```{r}
+
+```
+
+From both the boxplots and the table above, we can see that the average cross-validation estimate decreases as we increase the number of folds used in k-fold cross-validation. Additionally, increasing the number of folds also leads to much less variance in the cross-validation estimate. This is likely due to the fact that increasing the number of folds also increases the size of the training set. This potentially improves the model's ability to make accurate predictions when it comes to the testing set, thus decreasing the cross-validation estimate. However, as overfitting our model with too much training data is certainly still a danger, this will not necessarily be the case every time. This perhaps explains why some fold separations, such as the one above, yield a higher cross-validation estimate for 10-fold cross-validation in comparison to 5-fold cross-validation.
