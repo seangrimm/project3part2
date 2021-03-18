@@ -40,7 +40,7 @@ for (i in 1:90) {
 
 cv_ests$k <- factor(cv_ests$k, levels = c("2", "5", "10"))
 
-error_plot <- ggplot(data = cv_ests, aes(x = k, y = cv_est, group = k)) +
+ggplot(data = cv_ests, aes(x = k, y = cv_est, group = k)) +
   geom_boxplot() +
   labs(title = "k-Fold Cross-Validation Estimate") +
   theme_bw()
@@ -56,10 +56,13 @@ cv_table <- matrix(c(vect_2, vect_5, vect_10), nrow = 3, ncol = 2, byrow = TRUE)
 rownames(cv_table) <- c("k = 2", "k = 5", "k = 10")
 colnames(cv_table) <- c("Mean", "SD")
 as.table(cv_table)
-```
 
-```{r}
+# save figure to Output/Figures
+ggsave("../Output/Figures/error_fig.png")
 
+# save tables to Output/Results
+saveRDS(cv_table, file = "../Output/Results/cv_table.rds")
+write.csv(cv_ests, file = "../Output/Results/cv_ests.csv")
 ```
 
 From both the boxplots and the table above, we can see that the average cross-validation estimate decreases as we increase the number of folds used in k-fold cross-validation. Additionally, increasing the number of folds also leads to much less variance in the cross-validation estimate. This is likely due to the fact that increasing the number of folds also increases the size of the training set. This potentially improves the model's ability to make accurate predictions when it comes to the testing set, thus decreasing the cross-validation estimate. However, as overfitting our model with too much training data is certainly still a danger, this will not necessarily be the case every time. This perhaps explains why some fold separations, such as the one above, yield a higher cross-validation estimate for 10-fold cross-validation in comparison to 5-fold cross-validation.
